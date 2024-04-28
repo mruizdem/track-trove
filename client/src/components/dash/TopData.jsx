@@ -1,14 +1,11 @@
-import React, { useState } from "react";
 import {
 	Chart as ChartJS,
 	RadialLinearScale,
 	ArcElement,
 	Tooltip,
 	Legend,
-	layouts,
-	plugins,
 } from "chart.js";
-import { Doughnut, PolarArea } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
 
 const TopData = (props) => {
 	const { topArtists } = props;
@@ -48,6 +45,7 @@ const TopData = (props) => {
 		],
 	};
 
+	// options for charts
 	const options = {
 		plugins: {
 			legend: {

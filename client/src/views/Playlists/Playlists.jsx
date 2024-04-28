@@ -1,22 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { fetchPlaylists } from "../../services/BackendService";
 import { fetchUserData } from "../../services/SpotifyService";
+import HeaderSmall from "../../components/HeaderSmall";
+import PlaylistGrid from "../../components/playlists/PlaylistGrid";
 
-const Playlists = (props) => {
+const Playlists = () => {
 	const token = sessionStorage.getItem("token");
 	const [allPlaylists, setAllPlaylists] = useState([]);
 	const [userId, setUserId] = useState("");
 
 	useEffect(() => {
+		// if token exists grab user data
+		if (token) {
+			fetchUserData(token)
+				.then((res) => setUserId(res.id))
+				.catch((err) => console.log(err));
+		}
+
+		// fetch playlists from db
 		fetchPlaylists()
 			.then((res) => setAllPlaylists(res))
 			.catch((err) => console.log(err));
-
-		fetchUserData(token)
-			.then((res) => setUserId(res.id))
-			.catch((err) => console.log(err));
 	}, []);
 
+	// run another useEffect to check for updates to db
 	useEffect(() => {
 		fetchPlaylists()
 			.then((res) => setAllPlaylists(res))
@@ -25,43 +32,18 @@ const Playlists = (props) => {
 
 	return (
 		<div>
-			<h1 className="text-5xl text-center mt-5 mb-3">
-				Community Playlist Wall!
-			</h1>
-			<div className="text-center">
-				<a href="/dashboard" className="link block mb-3">
-					Return to Dash
-				</a>
-				<a href="/" className="link">
-					Back Home
-				</a>
-			</div>
+			<HeaderSmall
+				titleText={"Community Playlist Wall!"}
+				linkOneText={"Return to Dashboard"}
+				linkOnePath={"/dashboard"}
+				linkTwoText={"Back Home"}
+				linkTwoPath={"/"}
+			/>
 
-			<hr className="my-5" />
-
+			{/* playlist grid */}
 			<div className="flex flex-col md:grid md:grid-cols-3 gap-3 mb-5">
 				{allPlaylists.map((playlist, index) => (
-					<div
-						key={index}
-						className="relative rounded overflow-hidden text-center"
-					>
-						<a
-							href={`https://open.spotify.com/playlist/${playlist.playlist_id}`}
-						>
-							<img
-								src={playlist.playlist_img}
-								alt="playlist_img"
-								className="w-full mb-3 hover:scale-105"
-							/>
-						</a>
-						<p className="font-bold">{playlist.title}</p>
-						<p className="italic">Uploaded By: {playlist.spotify_user}</p>
-						{playlist.spotify_user === userId ? (
-							<a href={`/playlist/edit/${playlist._id}`} className="link">
-								Edit Playlist
-							</a>
-						) : null}
-					</div>
+					<PlaylistGrid key={index} playlist={playlist} userId={userId} />
 				))}
 			</div>
 		</div>
