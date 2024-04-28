@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const PlaylistGrid = (props) => {
 	const { playlist, userId } = props;
 	return (
@@ -13,9 +15,9 @@ const PlaylistGrid = (props) => {
 				<p className="font-bold">{playlist.title}</p>
 				<p className="italic">Uploaded By: {playlist.spotify_user}</p>
 				{playlist.spotify_user === userId ? (
-					<a href={`/playlist/edit/${playlist._id}`} className="link">
+					<Link to={`/playlist/edit/${playlist._id}`} className="link">
 						Edit Playlist
-					</a>
+					</Link>
 				) : null}
 			</div>
 		</>

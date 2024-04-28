@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { deletePlaylist, updatePlaylist } from "../../services/BackendService";
 
 const SinglePlaylist = (props) => {
-	const { playlist } = props;
+	const { playlist, setPlaylist } = props;
+	const navigate = useNavigate();
 
 	// updates the playlist, nav to community
 	const handleSubmit = (e) => {
