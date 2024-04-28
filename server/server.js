@@ -1,14 +1,22 @@
 import express from "express";
 import cors from "cors"
 import dotenv from "dotenv"
-// import dbConnect from "./config/mongoose.config.js";
-// import router from "./routes/person.route.js";
-import router from './routes/spotify.route.js'
+import dbConnect from "./config/mongoose.config.js";
+import playlistRouter from "./routes/playlist.route.js";
+import spotifyRouter from './routes/spotify.route.js'
+
 const app = express();
 app.use(express.json(), cors())
-app.use("/api", router)
+
+// Mounting Routers
+app.use("/api", spotifyRouter)
+app.use("/api", playlistRouter)
+
+
 dotenv.config()
 const PORT = process.env.PORT
-// dbConnect()
+
+// DB Connection
+dbConnect()
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));

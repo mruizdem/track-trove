@@ -4,15 +4,16 @@ import {
 	fetchTopTracks,
 	fetchUserData,
 } from "../services/SpotifyService";
-import Header from "../components/Header";
-import Charts from "../components/Charts";
+import Header from "../components/dash/Header";
+import TopLists from "../components/dash/TopLists";
+import TopData from "../components/dash/TopData";
 
 const UserDash = (props) => {
-	const { accessToken } = props;
 	const token = sessionStorage.getItem("token");
 	const [userData, setUserData] = useState({});
 	const [topArtists, setTopArtists] = useState([]);
 	const [topTracks, setTopTracks] = useState([]);
+	const [selectedRange, setSelectedRange] = useState("medium_term");
 
 	useEffect(() => {
 		// fetch user data
@@ -21,58 +22,80 @@ const UserDash = (props) => {
 			.catch((err) => console.error(err));
 
 		// fetch top artists
-		fetchTopArtists(token)
+		fetchTopArtists(token, selectedRange)
 			.then((res) => setTopArtists(res))
 			.catch((err) => console.log(err));
 
 		// fetch top tracks
-		fetchTopTracks(token)
+		fetchTopTracks(token, selectedRange)
 			.then((res) => setTopTracks(res))
 			.catch((err) => console.log(err));
-	}, []);
+	}, [token, selectedRange]);
+
+	const handleTimeRange = (token, time_range) => {
+		setSelectedRange(time_range);
+	};
 
 	return (
-		<div>
+		<>
+			{/* data will only load if the user data is fetched */}
 			{userData.display_name ? (
-				<div className="w-3/4 mx-auto mt-5">
-					<Header userData={userData} />
+				<div className="w-full mx-auto mt-5">
+					{/* header component */}
+					<Header
+						userData={userData}
+						linkOne={"Generate Playlist"}
+						linkTwo={"View Community Playlists"}
+					/>
+
 					<hr className="my-3" />
-					<div className="flex gap-5">
-						<ol className="w-1/2 text-center">
-							<p className="font-bold">Your Top 10 Artists</p>
-							<hr className="w-1/2 mx-auto my-1" />
-							{topArtists.map((artist, index) => (
-								<li key={index}>
-									{index + 1}. {artist.name}
-								</li>
-							))}
-						</ol>
-						<ol className="w-1/2 text-center">
-							<p className="font-bold">Your Top 10 Tracks</p>
-							<hr className="w-1/2 mx-auto my-1" />
-							{topTracks.map((track, index) => (
-								<li key={index}>
-									{index + 1}. {track.name}
-								</li>
-							))}
-						</ol>
+
+					{/* data range control buttons */}
+					<div className="flex justify-center gap-8 items-center mb-10">
+						<button
+							className="btn-success"
+							onClick={() => handleTimeRange(token, "long_term")}
+						>
+							{selectedRange === "long_term"
+								? "Past Year (Selected)"
+								: "Past Year"}
+						</button>
+						<button
+							className="btn-success"
+							onClick={() => handleTimeRange(token, "medium_term")}
+						>
+							{selectedRange === "medium_term"
+								? "Past 6 Months (Selected)"
+								: "Past 6 Months"}
+						</button>
+						<button
+							className="btn-success"
+							onClick={() => handleTimeRange(token, "short_term")}
+						>
+							{selectedRange === "short_term"
+								? "Past 4 Weeks (Selected)"
+								: "Past 4 Weeks"}
+						</button>
 					</div>
-					<hr className="my-3" />
-					<div className="text-center">
-						<a className="text-blue-300 hover:text-blue-500 underline" href="/">
+
+					<TopLists topArtists={topArtists} topTracks={topTracks} />
+					<hr className="my-5" />
+					<TopData topArtists={topArtists} />
+					<hr className="my-5" />
+
+					{/* return home link */}
+					<div className="text-center mb-10">
+						<a className="link" href="/">
 							Go back home
 						</a>
 					</div>
 				</div>
 			) : (
-				<div className="text-center">
+				<div className="text-center mb-10">
 					<a href="/">Go back home</a>
 				</div>
 			)}
-			<div className="w-3/4 mx-auto mb-10">
-				<Charts chartData={topArtists} />
-			</div>
-		</div>
+		</>
 	);
 };
 

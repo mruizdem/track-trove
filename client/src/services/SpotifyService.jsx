@@ -5,7 +5,6 @@ const http = axios.create({
 });
 
 // fetch user data (base)
-// /me
 const fetchUserData = (token) => {
 	return http
 		.get("/me", {
@@ -20,10 +19,9 @@ const fetchUserData = (token) => {
 };
 
 // fetch user top artists
-// /me/top/artists
-const fetchTopArtists = (token) => {
+const fetchTopArtists = (token, time_range = "medium_term") => {
 	return http
-		.get("/me/top/artists?limit=10", {
+		.get(`/me/top/artists?time_range=${time_range}&limit=10`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -35,10 +33,9 @@ const fetchTopArtists = (token) => {
 };
 
 // fetch user top tracks
-// /me/top/tracks
-const fetchTopTracks = (token) => {
+const fetchTopTracks = (token, time_range = "medium_term") => {
 	return http
-		.get("/me/top/tracks?limit=10", {
+		.get(`/me/top/tracks?time_range=${time_range}&limit=10`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -49,4 +46,23 @@ const fetchTopTracks = (token) => {
 		});
 };
 
-export { fetchUserData, fetchTopArtists, fetchTopTracks };
+// fetch playlists by category & limit
+const fetchPlaylistsByCategory = (token, category, limit) => {
+	return http
+		.get(`/browse/categories/${category}/playlists?limit=${Number(limit)}`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		})
+		.then((res) => res.data.playlists.items)
+		.catch((err) => {
+			throw err.response.data.error.message;
+		});
+};
+
+export {
+	fetchUserData,
+	fetchTopArtists,
+	fetchTopTracks,
+	fetchPlaylistsByCategory,
+};
