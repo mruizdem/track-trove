@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const HandleCallback = (props) => {
-	const { setAccessToken } = props;
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -10,7 +9,6 @@ const HandleCallback = (props) => {
 		const token = hasParams.get("access_token");
 
 		if (token) {
-			setAccessToken(token);
 			sessionStorage.setItem("token", token);
 		}
 		navigate("/dashboard");
@@ -18,7 +16,7 @@ const HandleCallback = (props) => {
 
 	return (
 		<div>
-			<h1>You should never see this</h1>
+			<h1>You should not see this page</h1>
 		</div>
 	);
 };

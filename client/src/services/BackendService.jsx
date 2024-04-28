@@ -5,13 +5,68 @@ const http = axios.create({
 });
 
 // PASS SENSITIVE INFO
-const fetchApiData = () => {
+// const fetchApiData = () => {
+// 	return http
+// 		.get("/spotify-data")
+// 		.then((res) => res.data)
+// 		.catch((err) => {
+// 			throw err;
+// 		});
+// };
+
+// POST REQUESTS
+const createPlaylist = (playlistData) => {
 	return http
-		.get("/spotify-data")
+		.post("/playlist/create", playlistData)
 		.then((res) => res.data)
 		.catch((err) => {
 			throw err;
 		});
 };
 
-export { fetchApiData };
+// GET REQUESTS
+const fetchPlaylists = () => {
+	return http
+		.get("/playlist")
+		.then((res) => res.data)
+		.catch((err) => {
+			throw err;
+		});
+};
+
+const fetchOnePlaylist = (playlist_id) => {
+	return http
+		.get(`/playlist/edit/${playlist_id}`)
+		.then((res) => res.data)
+		.catch((err) => {
+			throw err;
+		});
+};
+
+// PUT
+const updatePlaylist = (playlist) => {
+	return http
+		.put(`playlist/edit/${playlist._id}`, playlist)
+		.then((res) => res.data)
+		.catch((err) => {
+			throw err;
+		});
+};
+
+// DELETE
+const deletePlaylist = (playlist_id) => {
+	return http
+		.delete(`playlist/edit/${playlist_id}`)
+		.then((res) => res.data)
+		.catch((err) => {
+			throw err;
+		});
+};
+
+export {
+	createPlaylist,
+	fetchPlaylists,
+	fetchOnePlaylist,
+	updatePlaylist,
+	deletePlaylist,
+};
