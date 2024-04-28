@@ -1,22 +1,16 @@
-import React, { useState } from "react";
 import { createPlaylist } from "../../services/BackendService";
 import { useNavigate } from "react-router-dom";
 
 const PopUpBox = (props) => {
-	const { onClose, playlist, setPlaylist } = props;
+	const { setShowPopUp, playlist, setPlaylist } = props;
 	const navigate = useNavigate();
+
+	// Add playlist to database and navigate to community
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		createPlaylist(playlist)
 			.then((res) => res)
 			.catch((err) => console.log(err));
-		setPlaylist({
-			title: "",
-			playlist_id: "",
-			playlist_img: "",
-			spotify_user: "",
-		});
-		onClose();
 		navigate("/playlist");
 	};
 	return (
@@ -24,8 +18,9 @@ const PopUpBox = (props) => {
 			<div className="bg-black border border-white p-6 rounded shadow-md">
 				<h2 className="text-lg font-bold text-center">Add to Community</h2>
 				<p className="text-center italic mb-4">Give it a title!</p>
+
+				{/* Small Form to intake title */}
 				<form onSubmit={handleSubmit}>
-					{/* Form inputs and submit button */}
 					<div className="mb-3">
 						<label className="block font-bold mb-2">Title</label>
 						<input
@@ -33,7 +28,7 @@ const PopUpBox = (props) => {
 								setPlaylist({ ...playlist, title: e.target.value })
 							}
 							value={playlist.title}
-							className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
+							className="form-input"
 							type="text"
 						/>
 					</div>
@@ -41,8 +36,10 @@ const PopUpBox = (props) => {
 						Submit
 					</button>
 				</form>
+
+				{/* SVG setup for a close button in top right of screen */}
 				<button
-					onClick={onClose}
+					onClick={() => setShowPopUp(false)}
 					className="absolute top-0 right-0 mt-2 mr-2 z-10"
 				>
 					<svg

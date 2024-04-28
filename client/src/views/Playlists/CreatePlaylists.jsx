@@ -4,9 +4,13 @@ import {
 	fetchUserData,
 } from "../../services/SpotifyService";
 import PopUpBox from "../../components/playlists/CommunityPopUp";
+import { useNavigate } from "react-router-dom";
+import HeaderSmall from "../../components/HeaderSmall";
+import SpotifyGrid from "../../components/playlists/PlaylistGridSpotify";
 
-const CreatePlaylist = (props) => {
+const CreatePlaylist = () => {
 	const token = sessionStorage.getItem("token");
+	const navigate = useNavigate();
 	const [category, setCategory] = useState("dinner");
 	const [limit, setLimit] = useState(12);
 	const [playlists, setPlaylists] = useState([]);
@@ -21,15 +25,20 @@ const CreatePlaylist = (props) => {
 
 	useEffect(() => {
 		// fetch user data
-		fetchUserData(token)
-			.then((res) => setUserData(res))
-			.catch((err) => console.error(err));
+		if (token) {
+			fetchUserData(token)
+				.then((res) => setUserData(res))
+				.catch((err) => console.error(err));
 
-		fetchPlaylistsByCategory(token, category, limit)
-			.then((res) => setPlaylists(res))
-			.catch((err) => console.error(err));
+			fetchPlaylistsByCategory(token, category, limit)
+				.then((res) => setPlaylists(res))
+				.catch((err) => console.error(err));
+		} else {
+			navigate("/");
+		}
 	}, []);
 
+	// Fetch playlists based on category entered
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		fetchPlaylistsByCategory(token, category, limit)
@@ -37,6 +46,7 @@ const CreatePlaylist = (props) => {
 			.catch((err) => console.log(err));
 	};
 
+	// Handles the click of the add to comm btn, this will prep for database
 	const handleCommunityAddition = (id, img, user) => {
 		setShowPopUp(true);
 		setCommPlaylist({
@@ -47,26 +57,23 @@ const CreatePlaylist = (props) => {
 		});
 	};
 
-	const handleClosePopUp = () => {
-		setShowPopUp(false);
-	};
-
 	return (
-		<div className="mt-5 mb-3">
-			<div className="text-center">
-				<h1 className="text-5xl text-center text-white mb-3">
-					Generate a playlist!
-				</h1>
-				<a href="/dashboard" className="link">
-					Return to Dash
-				</a>
-			</div>
+		<>
+			{/* header component */}
+			<HeaderSmall
+				titleText={"Generate playlists!"}
+				linkOneText={"Return to Dashboard"}
+				linkOnePath={"/dashboard"}
+				linkTwoText={"View Community Playlists"}
+				linkTwoPath={"/playlist"}
+			/>
 
+			{/* user form to change category/limits */}
 			<form onSubmit={(e) => handleSubmit(e)}>
 				<div className="w-1/2 mx-auto mb-3">
 					<label className="block font-bold mb-2">Category</label>
 					<input
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
+						className="form-input"
 						id="category"
 						onChange={(e) => setCategory(e.target.value)}
 						value={category}
@@ -76,7 +83,7 @@ const CreatePlaylist = (props) => {
 				<div className="w-1/2 mx-auto mb-3">
 					<label className="block font-bold mb-2">How Many?</label>
 					<input
-						className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
+						className="form-input"
 						id="limit"
 						onChange={(e) => setLimit(e.target.value)}
 						value={limit}
@@ -86,52 +93,33 @@ const CreatePlaylist = (props) => {
 					/>
 				</div>
 				<div className="w-1/4 mx-auto">
-					<button className="btn-success w-full">Submit</button>
+					<button className="btn-success w-full">Generate</button>
 				</div>
 			</form>
 
 			<hr className="my-5" />
 
+			{/* Grid for spotify generated playlists */}
 			<div className="flex flex-col md:grid md:grid-cols-3 gap-3">
 				{playlists.map((playlist, index) => (
-					<div
+					<SpotifyGrid
 						key={index}
-						className="relative rounded overflow-hidden text-center"
-					>
-						<a href={`https://open.spotify.com/playlist/${playlist.id}`}>
-							<img
-								src={playlist.images[0]["url"]}
-								alt="playlist_img"
-								className="w-full mb-3 hover:scale-105"
-							/>
-						</a>
-						<button
-							onClick={() =>
-								handleCommunityAddition(
-									playlist.id,
-									playlist.images[0]["url"],
-									userData.id
-								)
-							}
-							className="btn-success text-xs mb-3"
-						>
-							Add to Community!
-						</button>
-						<p className="font-bold">{playlist.name}</p>
-						<p className="italic">{playlist.description}</p>
-					</div>
+						playlist={playlist}
+						handle={handleCommunityAddition}
+						userData={userData}
+					/>
 				))}
 			</div>
 
 			{/* Render the pop-up box if showPopUp set to true */}
 			{showPopUp && (
 				<PopUpBox
-					onClose={handleClosePopUp}
+					setShowPopUp={setShowPopUp}
 					setPlaylist={setCommPlaylist}
 					playlist={commPlaylist}
 				/>
 			)}
-		</div>
+		</>
 	);
 };
 

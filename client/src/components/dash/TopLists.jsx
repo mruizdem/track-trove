@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 const TopLists = (props) => {
 	const { topArtists, topTracks } = props;
 	return (
@@ -14,6 +12,7 @@ const TopLists = (props) => {
 					</li>
 				))}
 			</ol>
+
 			{/* tracks */}
 			<ol className="w-1/2 text-center">
 				<p className="font-bold">Your Top 10 Tracks</p>

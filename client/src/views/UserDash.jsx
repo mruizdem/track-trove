@@ -4,97 +4,112 @@ import {
 	fetchTopTracks,
 	fetchUserData,
 } from "../services/SpotifyService";
-import Header from "../components/dash/Header";
 import TopLists from "../components/dash/TopLists";
 import TopData from "../components/dash/TopData";
+import { useNavigate } from "react-router-dom";
+import HeaderSmall from "../components/HeaderSmall";
+import TimeRangeBtn from "../components/dash/TimeRangeBtn";
 
 const UserDash = (props) => {
 	const token = sessionStorage.getItem("token");
-	const [userData, setUserData] = useState({});
+	const [userData, setUserData] = useState("");
 	const [topArtists, setTopArtists] = useState([]);
 	const [topTracks, setTopTracks] = useState([]);
 	const [selectedRange, setSelectedRange] = useState("medium_term");
+	const [loading, setLoading] = useState(true);
+	const navigate = useNavigate();
 
 	useEffect(() => {
-		// fetch user data
-		fetchUserData(token)
-			.then((res) => setUserData(res))
-			.catch((err) => console.error(err));
+		// if the token exists, proceed otherwise redirect to home page
+		if (token) {
+			// fetch user data
+			fetchUserData(token)
+				.then((res) => {
+					setUserData(res);
+					setLoading(false);
+				})
+				.catch((err) => console.error(err));
 
-		// fetch top artists
-		fetchTopArtists(token, selectedRange)
-			.then((res) => setTopArtists(res))
-			.catch((err) => console.log(err));
+			// fetch top artists
+			fetchTopArtists(token, selectedRange)
+				.then((res) => setTopArtists(res))
+				.catch((err) => console.log(err));
 
-		// fetch top tracks
-		fetchTopTracks(token, selectedRange)
-			.then((res) => setTopTracks(res))
-			.catch((err) => console.log(err));
-	}, [token, selectedRange]);
-
-	const handleTimeRange = (token, time_range) => {
-		setSelectedRange(time_range);
-	};
+			// fetch top tracks
+			fetchTopTracks(token, selectedRange)
+				.then((res) => setTopTracks(res))
+				.catch((err) => console.log(err));
+		} else {
+			navigate("/");
+		}
+	}, [token, selectedRange, navigate]);
 
 	return (
 		<>
-			{/* data will only load if the user data is fetched */}
-			{userData.display_name ? (
-				<div className="w-full mx-auto mt-5">
-					{/* header component */}
-					<Header
-						userData={userData}
-						linkOne={"Generate Playlist"}
-						linkTwo={"View Community Playlists"}
-					/>
+			{/* header component */}
+			<HeaderSmall
+				titleText={`Welcome, ${userData.display_name}!`}
+				linkOneText={"Generate New Playlists"}
+				linkOnePath={"/playlist/create"}
+				linkTwoText={"View Community Playlists"}
+				linkTwoPath={"/playlist"}
+			/>
 
-					<hr className="my-3" />
-
-					{/* data range control buttons */}
-					<div className="flex justify-center gap-8 items-center mb-10">
-						<button
-							className="btn-success"
-							onClick={() => handleTimeRange(token, "long_term")}
-						>
-							{selectedRange === "long_term"
-								? "Past Year (Selected)"
-								: "Past Year"}
-						</button>
-						<button
-							className="btn-success"
-							onClick={() => handleTimeRange(token, "medium_term")}
-						>
-							{selectedRange === "medium_term"
-								? "Past 6 Months (Selected)"
-								: "Past 6 Months"}
-						</button>
-						<button
-							className="btn-success"
-							onClick={() => handleTimeRange(token, "short_term")}
-						>
-							{selectedRange === "short_term"
-								? "Past 4 Weeks (Selected)"
-								: "Past 4 Weeks"}
-						</button>
-					</div>
-
-					<TopLists topArtists={topArtists} topTracks={topTracks} />
-					<hr className="my-5" />
-					<TopData topArtists={topArtists} />
-					<hr className="my-5" />
-
-					{/* return home link */}
-					<div className="text-center mb-10">
-						<a className="link" href="/">
-							Go back home
-						</a>
-					</div>
-				</div>
+			{/* display for some userData */}
+			{loading ? (
+				<div className="text-center">Loading...</div>
 			) : (
-				<div className="text-center mb-10">
-					<a href="/">Go back home</a>
+				<div className="text-center">
+					<img
+						className="rounded mb-2 mx-auto"
+						src={userData.images[1].url}
+						alt="profile-pic"
+					/>
+					<p className="mb-2">{userData.display_name}</p>
+					<p className="mb-2">Follower Count: {userData.followers.total}</p>
 				</div>
 			)}
+
+			<hr className="my-3" />
+
+			{/* data range control buttons */}
+			<div className="flex justify-center items-center gap-5 mb-10">
+				<TimeRangeBtn
+					range={selectedRange}
+					setRange={setSelectedRange}
+					text={"Past Year"}
+					value={"long_term"}
+				/>
+				<TimeRangeBtn
+					range={selectedRange}
+					setRange={setSelectedRange}
+					text={"Past 6 Months"}
+					value={"medium_term"}
+				/>
+				<TimeRangeBtn
+					range={selectedRange}
+					setRange={setSelectedRange}
+					text={"Past 4 Weeks"}
+					value={"short_term"}
+				/>
+			</div>
+
+			{/* genereate the lists of top data */}
+			<TopLists topArtists={topArtists} topTracks={topTracks} />
+
+			<hr className="my-5" />
+
+			{/* genereate the charts for top data */}
+			<TopData topArtists={topArtists} />
+
+			<hr className="my-5" />
+
+			{/* return home link */}
+			<div className="text-center mb-10">
+				<a className="link" href="/">
+					Go back home
+				</a>
+			</div>
 		</>
 	);
 };
