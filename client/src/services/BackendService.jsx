@@ -10,7 +10,7 @@ const createPlaylist = (playlistData) => {
 		.post("/playlist/create", playlistData)
 		.then((res) => res.data)
 		.catch((err) => {
-			throw err;
+			throw err.response.data.errors;
 		});
 };
 
@@ -39,7 +39,7 @@ const updatePlaylist = (playlist) => {
 		.put(`playlist/edit/${playlist._id}`, playlist)
 		.then((res) => res.data)
 		.catch((err) => {
-			throw err;
+			throw err.response.data.errors;
 		});
 };
 

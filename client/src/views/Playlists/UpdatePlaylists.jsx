@@ -25,7 +25,7 @@ const UpdatePlaylist = () => {
 				linkTwoPath={"/dashboard"}
 			/>
 
-			<SinglePlaylist playlist={playlist} />
+			<SinglePlaylist playlist={playlist} setPlaylist={setPlaylist} />
 		</>
 	);
 };

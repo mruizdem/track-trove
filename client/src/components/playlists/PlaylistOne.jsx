@@ -1,15 +1,18 @@
+import { useNavigate } from "react-router-dom";
 import { deletePlaylist, updatePlaylist } from "../../services/BackendService";
+import { useState } from "react";
 
 const SinglePlaylist = (props) => {
-	const { playlist } = props;
+	const { playlist, setPlaylist } = props;
+	const [errors, setErrors] = useState({})
+	const navigate = useNavigate();
 
 	// updates the playlist, nav to community
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		updatePlaylist(playlist)
-			.then((res) => res)
-			.catch((err) => console.log(err));
-		navigate("/playlist");
+			.then((res) => navigate("/playlist"))
+			.catch((err) => setErrors({...errors, title: err.title.message}));
 	};
 
 	// removes the playlist, nav to community
@@ -52,6 +55,7 @@ const SinglePlaylist = (props) => {
 							className="form-input"
 							type="text"
 						/>
+						{errors.title ? <p className="text-red-500 text-center">{errors.title}</p> : null}
 					</div>
 					<button className="btn-success w-full">Submit</button>
 				</form>

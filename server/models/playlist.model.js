@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose"
 const playlistSchema = new Schema({
     title: {
         type: String,
-        required: true,
+        required: [true, "A title is required!"],
     },
     playlist_id: {
         type: String,
