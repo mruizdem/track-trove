@@ -9,6 +9,7 @@ import TopData from "../components/dash/TopData";
 import { useNavigate } from "react-router-dom";
 import HeaderSmall from "../components/HeaderSmall";
 import TimeRangeBtn from "../components/dash/TimeRangeBtn";
+import UserInfo from "../components/dash/UserData";
 
 const UserDash = (props) => {
 	const token = sessionStorage.getItem("token");
@@ -55,25 +56,13 @@ const UserDash = (props) => {
 				linkTwoPath={"/playlist"}
 			/>
 
-			{/* display for some userData */}
-			{loading ? (
-				<div className="text-center">Loading...</div>
-			) : (
-				<div className="text-center">
-					<img
-						className="rounded mb-2 mx-auto"
-						src={userData.images[1].url}
-						alt="profile-pic"
-					/>
-					<p className="mb-2">{userData.display_name}</p>
-					<p className="mb-2">Follower Count: {userData.followers.total}</p>
-				</div>
-			)}
+			{/* user data component */}
+			<UserInfo loading={loading} userData={userData} />
 
 			<hr className="my-3" />
 
 			{/* data range control buttons */}
-			<div className="flex justify-center items-center gap-5 mb-10">
+			<div className="flex justify-evenly items-center gap-5 mb-10">
 				<TimeRangeBtn
 					range={selectedRange}
 					setRange={setSelectedRange}
