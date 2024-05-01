@@ -16,6 +16,7 @@ const CreatePlaylist = () => {
 	const [playlists, setPlaylists] = useState([]);
 	const [showPopUp, setShowPopUp] = useState(false);
 	const [userData, setUserData] = useState("");
+	const [error, setError] = useState("");
 	const [commPlaylist, setCommPlaylist] = useState({
 		title: "",
 		playlist_id: "",
@@ -31,8 +32,11 @@ const CreatePlaylist = () => {
 				.catch((err) => console.error(err));
 
 			fetchPlaylistsByCategory(token, category, limit)
-				.then((res) => setPlaylists(res))
-				.catch((err) => console.error(err));
+				.then((res) => {
+					setPlaylists(res);
+					setError("");
+				})
+				.catch((err) => setError(err));
 		} else {
 			navigate("/");
 		}
@@ -42,8 +46,11 @@ const CreatePlaylist = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		fetchPlaylistsByCategory(token, category, limit)
-			.then((res) => setPlaylists(res))
-			.catch((err) => console.log(err));
+			.then((res) => {
+				setError("");
+				setPlaylists(res);
+			})
+			.catch((err) => setError(err));
 	};
 
 	// Handles the click of the add to comm btn, this will prep for database
@@ -80,6 +87,7 @@ const CreatePlaylist = () => {
 						type="text"
 					/>
 				</div>
+				{error ? <p className="text-red-500 text-center">{error}</p> : null}
 				<div className="w-1/2 mx-auto mb-3">
 					<label className="block font-bold mb-2">How Many?</label>
 					<input
